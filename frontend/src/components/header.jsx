@@ -1,8 +1,15 @@
-import { Button } from "./UI/button"
+import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Button } from "./UI/button";
+import Login from "./Login";
+import Signup from "./Signup";
 
 export function Header() {
+  const [showLogin, setShowLogin] = useState(false);
+  const [showSignup, setShowSignup] = useState(false);
+
   return (
-    <header className="flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur-sm">
+    <header className="w-full flex items-center justify-between px-6 py-4 bg-white shadow-md relative z-20">
       {/* Logo */}
       <div className="flex items-center gap-2">
         <div className="relative w-8 h-8">
@@ -22,32 +29,49 @@ export function Header() {
 
       {/* Navigation */}
       <nav className="hidden md:flex items-center gap-8">
-        <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">
-          COMMUNITY
-        </a>
-        <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">
-          ART
-        </a>
-        <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">
-          ABOUT
-        </a>
+        <Link to="/art" className="text-gray-700 hover:text-gray-900 font-medium">ART</Link>
+        <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">COMMUNITY</a>
+        <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">ABOUT</a>
       </nav>
 
       {/* User Actions */}
       <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" className="text-blue-600 border-blue-600 hover:bg-blue-50 bg-transparent">
-          Visitor
-        </Button>
-        <Button variant="default" size="sm" className="bg-blue-600 hover:bg-blue-700">
-          Artist
-        </Button>
-        <Button variant="outline" size="sm">
-          Login
-        </Button>
-        <Button variant="outline" size="sm">
-          Register
-        </Button>
+        {/* <Button variant="outline" size="sm">Visitor</Button>
+        <Button variant="default" size="sm" className="bg-blue-600 hover:bg-blue-700">Artist</Button> */}
+
+        <Button variant="outline" size="sm" onClick={() => setShowLogin(true)}>Login</Button>
+        <Button variant="outline" size="sm" onClick={() => setShowSignup(true)}>Register</Button>
       </div>
+
+      {/* Login Modal */}
+      {showLogin && (
+        <div className="fixed inset-0 z-50 flex justify-center items-center bg-black/50 p-4">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md relative p-6">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl font-bold"
+              onClick={() => setShowLogin(false)}
+            >
+              ✕
+            </button>
+            <Login />
+          </div>
+        </div>
+      )}
+
+      {/* Signup Modal */}
+      {showSignup && (
+        <div className="fixed inset-0 z-50 flex justify-center items-center bg-black/50 p-4 overflow-auto">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-lg relative p-6 max-h-[90vh] overflow-y-auto">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl font-bold"
+              onClick={() => setShowSignup(false)}
+            >
+              ✕
+            </button>
+            <Signup />
+          </div>
+        </div>
+      )}
     </header>
-  )
+  );
 }

@@ -1,5 +1,5 @@
-import { Header } from "./header.jsx"
-import { HeroSection } from "./hero-section.jsx"
+import { Header } from "./Header.jsx"
+import { HeroSection } from "./HeroSection.jsx"
 
 export function ArthubLanding() {
   return (
