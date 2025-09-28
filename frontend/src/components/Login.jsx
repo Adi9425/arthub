@@ -2,28 +2,64 @@ import React, { useState } from "react";
 
 export default function Login() {
   const [role, setRole] = useState("visitor"); // default role
-  const [usernameOrEmail, setUsernameOrEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState(""); // use email for backend
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    
-    try{
-      localStorage.setItem("userId", user.id);
-      localStorage.setItem("userName", user.username);
+    setError("");
+    setLoading(true);
 
-      console.log("User saved to localStorage:", user);
+    try {
+      // Payload for backend
+      const payload = { role, email, password };
 
-      // Optional: Close login modal here or redirect
+      const response = await fetch("http://localhost:3000/api/v1/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Login failed. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      // Save user info to localStorage
+      localStorage.setItem("userId", data.userId);
+      localStorage.setItem("userName", data.userName);
+      localStorage.setItem("token", data.token);
+
+      console.log("User saved to localStorage:", {
+        id: data.userId,
+        username: data.userName,
+      });
+
+      setLoading(false);
+
+      // Optional: redirect based on role
+      // if (role === "artist") {
+      //   window.location.href = "/artist/dashboard";
+      // } else {
+      //   window.location.href = "/visitor/home";
+      // }
+
     } catch (err) {
       console.error(err);
       setError("Login failed. Please try again.");
+      setLoading(false);
     }
   };
 
   return (
-    <div>
+    <div className="max-w-md mx-auto mt-10 p-6 border rounded-lg shadow-lg bg-white">
       <h2 className="text-2xl mb-5 text-center font-semibold">Login</h2>
 
       {/* Role Selection */}
@@ -55,10 +91,10 @@ export default function Login() {
 
       <form onSubmit={handleLogin} className="flex flex-col gap-4">
         <input
-          type="text"
-          placeholder="Username or Email"
-          value={usernameOrEmail}
-          onChange={(e) => setUsernameOrEmail(e.target.value)}
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
@@ -76,14 +112,22 @@ export default function Login() {
 
         <button
           type="submit"
-          className="w-full py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+          className={`w-full py-3 text-white rounded-lg transition ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-500 hover:bg-blue-600"
+          }`}
+          disabled={loading}
         >
-          Log In
+          {loading ? "Logging in..." : "Log In"}
         </button>
       </form>
 
       <p className="text-center text-gray-600 mt-4">
-        Don't have an account? <a href="#" className="text-blue-500 font-medium">Sign up</a>
+        Don't have an account?{" "}
+        <a href="#" className="text-blue-500 font-medium">
+          Sign up
+        </a>
       </p>
     </div>
   );
