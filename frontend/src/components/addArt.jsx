@@ -42,10 +42,10 @@ export default function AddPost({ onClose }) {
 
     console.log("Debug -> userId:", userId, "username:", username);
 
-    if (!userId || !username) {
-      toast.error("User not logged in!");
-      return;
-    }
+    // if (!userId || !username) {
+    //   toast.error("User not logged in!");
+    //   return;
+    // }
 
     if (!title || !description || !price) {
       toast.error("Please fill all required fields");
