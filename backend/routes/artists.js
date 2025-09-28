@@ -5,6 +5,6 @@ import {getArtworksByUser} from "../controllers/artistsInventory.js"
 const router = express.Router();
 
 router.post("/profile",artistSignup);
-router.ger("/inventory",getArtworksByUser);
+router.get("/inventory",getArtworksByUser);
 
 export default router;

@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Button } from "./UI/button";
 import Login from "./Login";
 import Signup from "./Signup";
@@ -7,6 +7,35 @@ import Signup from "./Signup";
 export function Header() {
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
+  const [userName, setUserName] = useState(null);
+  const [role, setRole] = useState(null);
+  const [showMenu, setShowMenu] = useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const storedName = localStorage.getItem("userName");
+    const storedRole = localStorage.getItem("role"); // 👈 role saved in localStorage
+
+    if (token && storedName) {
+      setUserName(storedName);
+    }
+    if (storedRole) {
+      setRole(storedRole);
+    }
+  }, []);
+
+  const handleSignOut = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("role");
+    setUserName(null);
+    setRole(null);
+    setShowMenu(false);
+    navigate("/"); // redirect to home
+  };
 
   return (
     <header className="w-full flex items-center justify-between px-6 py-4 bg-white shadow-md relative z-20">
@@ -35,12 +64,59 @@ export function Header() {
       </nav>
 
       {/* User Actions */}
-      <div className="flex items-center gap-2">
-        {/* <Button variant="outline" size="sm">Visitor</Button>
-        <Button variant="default" size="sm" className="bg-blue-600 hover:bg-blue-700">Artist</Button> */}
+      <div className="flex items-center gap-2 relative">
+        {!userName ? (
+          <>
+            <Button variant="outline" size="sm" onClick={() => setShowLogin(true)}>Login</Button>
+            <Button variant="outline" size="sm" onClick={() => setShowSignup(true)}>Register</Button>
+          </>
+        ) : (
+          <div className="flex items-center gap-3">
+            {/* Show Add Your Art button if role is artist */}
+            {role === "artist" && (
+              <Button
+                variant="default"
+                size="sm"
+                className="bg-green-600 hover:bg-green-700"
+                onClick={() => navigate("/addArt")}
+              >
+                Add Your Art
+              </Button>
+            )}
 
-        <Button variant="outline" size="sm" onClick={() => setShowLogin(true)}>Login</Button>
-        <Button variant="outline" size="sm" onClick={() => setShowSignup(true)}>Register</Button>
+            <div className="relative">
+              <button
+                onClick={() => setShowMenu((prev) => !prev)}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              >
+                {userName}
+              </button>
+
+              {showMenu && (
+                <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg py-2 z-50">
+                  <button
+                    onClick={() => { setShowMenu(false); navigate("/profile"); }}
+                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  >
+                    Profile
+                  </button>
+                  <button
+                    onClick={() => { setShowMenu(false); navigate("/orders"); }}
+                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  >
+                    Orders
+                  </button>
+                  <button
+                    onClick={handleSignOut}
+                    className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Login Modal */}

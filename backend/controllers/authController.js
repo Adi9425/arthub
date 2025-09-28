@@ -67,7 +67,7 @@ export const login = async (req, res) => {
     const userId = user._id;
     const userName = user.username || "";
 
-    res.status(200).json({ userId, userName, token });
+    res.status(200).json({ userId, userName, token ,role});
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });

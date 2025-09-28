@@ -1,19 +1,18 @@
 import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Login() {
   const [role, setRole] = useState("visitor"); // default role
-  const [email, setEmail] = useState(""); // use email for backend
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
     try {
-      // Payload for backend
       const payload = { role, email, password };
 
       const response = await fetch("http://localhost:3000/api/v1/auth/login", {
@@ -27,7 +26,9 @@ export default function Login() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Login failed. Please try again.");
+        toast.error(data.error || "Login failed. Please try again.", {
+          position: "top-center",
+        });
         setLoading(false);
         return;
       }
@@ -36,24 +37,26 @@ export default function Login() {
       localStorage.setItem("userId", data.userId);
       localStorage.setItem("userName", data.userName);
       localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
+      
 
-      console.log("User saved to localStorage:", {
-        id: data.userId,
-        username: data.userName,
+      toast.success("Login successful! Redirecting...", {
+        position: "top-center",
+        autoClose: 2000,
       });
 
       setLoading(false);
 
-      // Optional: redirect based on role
-      // if (role === "artist") {
-      //   window.location.href = "/artist/dashboard";
-      // } else {
-      //   window.location.href = "/visitor/home";
-      // }
+      // Redirect after short delay
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1000);
 
     } catch (err) {
       console.error(err);
-      setError("Login failed. Please try again.");
+      toast.error("Something went wrong. Please try again.", {
+        position: "top-center",
+      });
       setLoading(false);
     }
   };
@@ -108,8 +111,6 @@ export default function Login() {
           required
         />
 
-        {error && <p className="text-red-500 text-center">{error}</p>}
-
         <button
           type="submit"
           className={`w-full py-3 text-white rounded-lg transition ${
@@ -129,6 +130,9 @@ export default function Login() {
           Sign up
         </a>
       </p>
+
+      {/* Toast notifications */}
+      <ToastContainer />
     </div>
   );
 }

@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Signup() {
   const [role, setRole] = useState("visitor");
@@ -38,7 +40,6 @@ export default function Signup() {
 
     try {
       let payload = { username, email, password };
-
       let url = "http://localhost:3000/api/v1/auth/signup"; // default visitor endpoint
 
       if (role === "artist") {
@@ -67,9 +68,19 @@ export default function Signup() {
         return;
       }
 
-      console.log("Signup successful:", data);
-      alert("Signup successful! You can now log in.");
+      // Show success toast
+      toast.success("Signup successful! Redirecting...", {
+        position: "top-center",
+        autoClose: 1000,
+        hideProgressBar: true,
+      });
+
       setLoading(false);
+
+      // Redirect after 1 second
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1000);
 
     } catch (err) {
       console.error(err);
@@ -82,7 +93,6 @@ export default function Signup() {
     <div className="max-w-md mx-auto mt-10 p-6 border rounded-lg shadow-lg bg-white">
       <h2 className="text-2xl font-semibold text-center mb-4">Sign Up</h2>
 
-      {/* Role Selection */}
       <div className="flex justify-center gap-6 mb-4">
         <label className="flex items-center gap-2 cursor-pointer">
           <input
@@ -134,7 +144,6 @@ export default function Signup() {
           required
         />
 
-        {/* Artist additional fields */}
         {role === "artist" && (
           <>
             <textarea
@@ -178,6 +187,8 @@ export default function Signup() {
           {loading ? "Signing up..." : "Sign Up"}
         </button>
       </form>
+
+      <ToastContainer />
     </div>
   );
 }
